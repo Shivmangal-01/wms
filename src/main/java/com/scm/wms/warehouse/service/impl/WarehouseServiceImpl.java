@@ -1,15 +1,15 @@
-package com.scm.wms.service.impl;
+package com.scm.wms.warehouse.service.impl;
 
-import com.scm.wms.audit.WarehouseAuditService;
+import com.scm.wms.warehouse.audit.WarehouseAuditService;
 
-import com.scm.wms.dto.request.WarehouseRequestDto;
-import com.scm.wms.dto.response.WarehouseResponseDto;
-import com.scm.wms.entities.Warehouse;
-import com.scm.wms.exception.DuplicateResourceException;
-import com.scm.wms.exception.ResourceNotFoundException;
-import com.scm.wms.mapper.WarehouseMapper;
-import com.scm.wms.repository.WarehouseRepository;
-import com.scm.wms.service.WarehouseService;
+import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.entities.Warehouse;
+import com.scm.wms.warehouse.exception.DuplicateResourceException;
+import com.scm.wms.warehouse.exception.ResourceNotFoundException;
+import com.scm.wms.warehouse.mapper.WarehouseMapper;
+import com.scm.wms.warehouse.repository.WarehouseRepository;
+import com.scm.wms.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
-package com.scm.wms.service;
+package com.scm.wms.warehouse.service;
 
-import com.scm.wms.dto.request.WarehouseRequestDto;
-import com.scm.wms.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

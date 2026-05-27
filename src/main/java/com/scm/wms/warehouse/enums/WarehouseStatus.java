@@ -1,4 +1,4 @@
-package com.scm.wms.enums;
+package com.scm.wms.warehouse.enums;
 
 public enum WarehouseStatus {
     ACTIVE,

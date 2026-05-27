@@ -1,6 +1,6 @@
-package com.scm.wms.dto.request;
+package com.scm.wms.warehouse.dto.request;
 
-import com.scm.wms.enums.WarehouseStatus;
+import com.scm.wms.warehouse.enums.WarehouseStatus;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 

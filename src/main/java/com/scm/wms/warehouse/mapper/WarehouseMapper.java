@@ -1,8 +1,8 @@
-package com.scm.wms.mapper;
+package com.scm.wms.warehouse.mapper;
 
-import com.scm.wms.dto.request.WarehouseRequestDto;
-import com.scm.wms.dto.response.WarehouseResponseDto;
-import com.scm.wms.entities.Warehouse;
+import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.entities.Warehouse;
 
 public class WarehouseMapper {
 

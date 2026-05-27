@@ -1,6 +1,6 @@
-package com.scm.wms.dto.response;
+package com.scm.wms.warehouse.dto.response;
 
-import com.scm.wms.enums.WarehouseStatus;
+import com.scm.wms.warehouse.enums.WarehouseStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

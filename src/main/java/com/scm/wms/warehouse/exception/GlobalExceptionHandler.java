@@ -1,4 +1,4 @@
-package com.scm.wms.exception;
+package com.scm.wms.warehouse.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.scm.wms.exception;
+package com.scm.wms.warehouse.exception;
 
 public class DuplicateResourceException extends RuntimeException{
     public DuplicateResourceException(String msg){

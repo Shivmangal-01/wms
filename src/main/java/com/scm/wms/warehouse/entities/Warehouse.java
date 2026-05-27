@@ -1,6 +1,6 @@
-package com.scm.wms.entities;
+package com.scm.wms.warehouse.entities;
 
-import com.scm.wms.enums.WarehouseStatus;
+import com.scm.wms.warehouse.enums.WarehouseStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

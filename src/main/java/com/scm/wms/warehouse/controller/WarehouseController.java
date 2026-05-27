@@ -1,8 +1,8 @@
-package com.scm.wms.controller;
+package com.scm.wms.warehouse.controller;
 
-import com.scm.wms.dto.request.WarehouseRequestDto;
-import com.scm.wms.dto.response.WarehouseResponseDto;
-import com.scm.wms.service.WarehouseService;
+import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.scm.wms.audit;
+package com.scm.wms.warehouse.audit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

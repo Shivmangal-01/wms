@@ -1,7 +1,7 @@
-package com.scm.wms.report;
+package com.scm.wms.warehouse.report;
 
-import com.scm.wms.entities.Warehouse;
-import com.scm.wms.repository.WarehouseRepository;
+import com.scm.wms.warehouse.entities.Warehouse;
+import com.scm.wms.warehouse.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;

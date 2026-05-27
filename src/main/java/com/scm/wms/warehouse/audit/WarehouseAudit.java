@@ -1,4 +1,4 @@
-package com.scm.wms.audit;
+package com.scm.wms.warehouse.audit;
 
 import jakarta.persistence.*;
 import lombok.*;

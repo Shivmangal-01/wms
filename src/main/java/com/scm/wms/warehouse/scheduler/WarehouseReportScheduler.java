@@ -1,7 +1,7 @@
-package com.scm.wms.scheduler;
+package com.scm.wms.warehouse.scheduler;
 
 
-import com.scm.wms.report.WarehouseUtilizationReportService;
+import com.scm.wms.warehouse.report.WarehouseUtilizationReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
