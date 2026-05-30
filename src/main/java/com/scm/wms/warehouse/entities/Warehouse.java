@@ -68,5 +68,4 @@ public class Warehouse {
         updatedAt = LocalDateTime.now();
     }
 
-
 }

@@ -1,14 +1,14 @@
-package com.scm.wms.service;
+package com.scm.wms.warehouse.service;
 
 
-import com.scm.wms.dto.request.WarehouseRequestDto;
-import com.scm.wms.dto.response.WarehouseResponseDto;
-import com.scm.wms.entities.Warehouse;
-import com.scm.wms.enums.WarehouseStatus;
-import com.scm.wms.exception.DuplicateResourceException;
-import com.scm.wms.exception.ResourceNotFoundException;
-import com.scm.wms.repository.WarehouseRepository;
-import com.scm.wms.service.impl.WarehouseServiceImpl;
+import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.entities.Warehouse;
+import com.scm.wms.warehouse.enums.WarehouseStatus;
+import com.scm.wms.warehouse.exception.DuplicateResourceException;
+import com.scm.wms.warehouse.exception.ResourceNotFoundException;
+import com.scm.wms.warehouse.repository.WarehouseRepository;
+import com.scm.wms.warehouse.service.impl.WarehouseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

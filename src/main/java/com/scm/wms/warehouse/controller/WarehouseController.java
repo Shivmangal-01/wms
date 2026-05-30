@@ -3,6 +3,7 @@ package com.scm.wms.warehouse.controller;
 import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
 import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
 import com.scm.wms.warehouse.service.WarehouseService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ public class WarehouseController {
 
     //controller to create thr warehouse
     @PostMapping
+    @Operation(summary = "Create warehouse")
     public ResponseEntity<WarehouseResponseDto> createWarehouse(
             @Valid @RequestBody WarehouseRequestDto requestDto
             ){
@@ -31,6 +33,7 @@ public class WarehouseController {
 
     //controller to get all warehouses
     @GetMapping
+    @Operation(summary = "Get all warehouses")
     public ResponseEntity<Page<WarehouseResponseDto>>
     getAllWarehouses(
             @RequestParam(defaultValue = "0") int page,
@@ -50,13 +53,16 @@ public class WarehouseController {
     }
 
     //controller to get warehouse by its id
+
     @GetMapping("/{id}")
+    @Operation(summary = "Get Warehouse By Its ID")
     public ResponseEntity<WarehouseResponseDto>getWarehouseById(
             @PathVariable Long id){
         return ResponseEntity.ok(warehouseService.getWarehouseById(id));
     }
 
     //controller to update warehouse
+    @Operation(summary = "Update Warehouse")
     @PutMapping("/{id}")
     public ResponseEntity<WarehouseResponseDto>updateWarehouse(
             @PathVariable Long id,
@@ -67,6 +73,7 @@ public class WarehouseController {
 
 
     //controller to delete the warehouse
+    @Operation(summary = "Delete Warehouse")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteWarehouse(
             @PathVariable Long id
@@ -76,6 +83,7 @@ public class WarehouseController {
     }
 
     //controller to get warehouse by its name
+    @Operation(summary = "Search Warehouse By Its Name")
     @GetMapping("/search")
     public ResponseEntity<List<WarehouseResponseDto>>
     searchWarehouse(@RequestParam String name) {
