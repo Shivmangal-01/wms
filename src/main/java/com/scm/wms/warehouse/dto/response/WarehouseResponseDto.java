@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class WarehouseResponseDto {
     private Long id;
+    private Long version;
     private String warehouseCode;
     private String name;
 

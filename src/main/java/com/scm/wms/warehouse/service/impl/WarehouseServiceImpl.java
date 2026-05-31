@@ -4,7 +4,10 @@ import com.scm.wms.warehouse.audit.WarehouseAuditService;
 
 import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
 import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.dto.response.WarehouseStatsDto;
 import com.scm.wms.warehouse.entities.Warehouse;
+import com.scm.wms.warehouse.enums.AuditAction;
+import com.scm.wms.warehouse.enums.WarehouseStatus;
 import com.scm.wms.warehouse.exception.DuplicateResourceException;
 import com.scm.wms.warehouse.exception.ResourceNotFoundException;
 import com.scm.wms.warehouse.mapper.WarehouseMapper;
@@ -13,10 +16,10 @@ import com.scm.wms.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
 
-    @Autowired
+
     private final WarehouseRepository warehouseRepository;
 
     private final WarehouseAuditService auditService;
@@ -32,9 +35,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     private static final Logger logger =
             LoggerFactory.getLogger(WarehouseServiceImpl.class);
 
+    private static final List<String> ALLOWED_SORT_FIELDS =
+            List.of("id", "name", "warehouseCode",
+                    "capacity", "status", "createdAt");
+
     @Override
-    public WarehouseResponseDto createWarehouse(
-            WarehouseRequestDto requestDto) {
+    @Transactional
+    public WarehouseResponseDto createWarehouse(WarehouseRequestDto requestDto) {
 
         logger.info("Creating warehouse: {}",
                 requestDto.getWarehouseCode());
@@ -47,6 +54,14 @@ public class WarehouseServiceImpl implements WarehouseService {
             );
         });
 
+        if (requestDto.getUsedCapacity() > requestDto.getCapacity()) {
+            throw new IllegalArgumentException(
+                    "Used capacity cannot exceed total capacity");
+        }
+
+
+
+
         Warehouse warehouse = WarehouseMapper.toEntity(requestDto);
 
         Warehouse savedWarehouse =
@@ -54,7 +69,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         auditService.logAction(
                 warehouse.getWarehouseCode(),
-                "CREATE",
+                AuditAction.CREATE.name(),
                 "ADMIN",
                 "Warehouse created successfully"
         );
@@ -64,11 +79,14 @@ public class WarehouseServiceImpl implements WarehouseService {
 
 
     @Override
-    public Page<WarehouseResponseDto> getAllWarehouses(
-            int page,
-            int size,
-            String sortBy,
-            String sortDir) {
+    public Page<WarehouseResponseDto> getAllWarehouses(int page, int size, String sortBy, String sortDir) {
+
+
+
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new IllegalArgumentException(
+                    "Invalid sort field: " + sortBy);
+        }
 
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
@@ -77,8 +95,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         Pageable pageable =
                 PageRequest.of(page, size, sort);
 
-        Page<Warehouse> warehousePage =
-                warehouseRepository.findAll(pageable);
+        Page<Warehouse> warehousePage = warehouseRepository.findByIsDeletedFalse(pageable);
 
         return warehousePage.map(WarehouseMapper::toDto);
     }
@@ -94,15 +111,26 @@ public class WarehouseServiceImpl implements WarehouseService {
                                 "Warehouse not found with id: " + id
                         ));
 
+        if (warehouse.getIsDeleted()) {
+            throw new ResourceNotFoundException(
+                    "Warehouse not found with id: " + id);
+        }
+
         return WarehouseMapper.toDto(warehouse);
     }
 
     @Override
+    @Transactional
     public WarehouseResponseDto updateWarehouse(
             Long id,
             WarehouseRequestDto requestDto) {
 
         logger.info("Updating warehouse with id: {}", id);
+
+        if (requestDto.getUsedCapacity() > requestDto.getCapacity()) {
+            throw new IllegalArgumentException(
+                    "Used capacity cannot exceed total capacity");
+        }
 
         Warehouse warehouse = warehouseRepository.findById(id)
                 .orElseThrow(() ->
@@ -123,7 +151,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         auditService.logAction(
                 warehouse.getWarehouseCode(),
-                "UPDATE",
+                AuditAction.UPDATE.name(),
                 "ADMIN",
                 "Warehouse updated successfully"
         );
@@ -132,6 +160,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public void deleteWarehouse(Long id) {
 
         logger.info("Deleting warehouse with id: {}", id);
@@ -147,20 +176,53 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         auditService.logAction(
                 warehouse.getWarehouseCode(),
-                "DELETE",
+                AuditAction.DELETE.name(),
                 "ADMIN",
                 "Warehouse soft deleted"
         );
     }
 
     @Override
-    public List<WarehouseResponseDto> searchWarehouse(
-            String name) {
+    public Page<WarehouseResponseDto> searchWarehouse(
+            String name, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
 
         return warehouseRepository
-                .findByName(name)
-                .stream()
-                .map(WarehouseMapper::toDto)
-                .toList();
+                .findByNameContainingIgnoreCaseAndIsDeletedFalse(name, pageable)
+                .map(WarehouseMapper::toDto);
+    }
+
+
+    @Override
+    public WarehouseStatsDto getWarehouseStats() {
+
+        List<Warehouse> warehouses =
+                warehouseRepository.findByIsDeletedFalse();
+
+        int totalCapacity = warehouses.stream()
+                .mapToInt(Warehouse::getCapacity)
+                .sum();
+
+        int totalUsed = warehouses.stream()
+                .mapToInt(w -> w.getUsedCapacity() != null
+                        ? w.getUsedCapacity() : 0)
+                .sum();
+
+        long activeWarehouses = warehouses.stream()
+                .filter(w -> w.getStatus() == WarehouseStatus.ACTIVE)
+                .count();
+
+        double utilization = totalCapacity > 0
+                ? Math.round((totalUsed * 100.0 / totalCapacity) * 100.0) / 100.0
+                : 0.0;
+
+        return WarehouseStatsDto.builder()
+                .totalWarehouses(warehouses.size())
+                .activeWarehouses(activeWarehouses)
+                .totalCapacity(totalCapacity)
+                .totalUsedCapacity(totalUsed)
+                .utilizationPercent(utilization)
+                .build();
     }
 }

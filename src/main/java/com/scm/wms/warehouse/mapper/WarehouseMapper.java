@@ -24,6 +24,7 @@ public class WarehouseMapper {
 
         return WarehouseResponseDto.builder()
                 .id(warehouse.getId())
+                .version(warehouse.getVersion())
                 .warehouseCode(warehouse.getWarehouseCode())
                 .name(warehouse.getName())
                 .location(warehouse.getLocation())

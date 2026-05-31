@@ -2,6 +2,7 @@ package com.scm.wms.warehouse.service;
 
 import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
 import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.dto.response.WarehouseStatsDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -29,5 +30,7 @@ public interface WarehouseService {
 
     void deleteWarehouse(Long id);
 
-    List<WarehouseResponseDto> searchWarehouse(String name);
+    Page<WarehouseResponseDto> searchWarehouse(String name, int page, int size);
+
+    WarehouseStatsDto getWarehouseStats();
 }

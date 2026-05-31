@@ -22,8 +22,7 @@ public class WarehouseUtilizationReportService {
 
     public void generateDailyWarehouseReport() {
 
-        List<Warehouse> warehouses =
-                warehouseRepository.findAll();
+        List<Warehouse> warehouses = warehouseRepository.findByIsDeletedFalse();
 
         String fileName =
                 "warehouse-report-" +
@@ -66,9 +65,9 @@ public class WarehouseUtilizationReportService {
 
                 Row row = sheet.createRow(rowNum++);
 
-                int freeCapacity =
-                        warehouse.getCapacity()
-                                - warehouse.getUsedCapacity();
+
+                int used = warehouse.getUsedCapacity() != null ? warehouse.getUsedCapacity() : 0;
+                int freeCapacity = warehouse.getCapacity() - used;
 
                 row.createCell(0)
                         .setCellValue(
@@ -90,10 +89,7 @@ public class WarehouseUtilizationReportService {
                                 warehouse.getCapacity()
                         );
 
-                row.createCell(4)
-                        .setCellValue(
-                                warehouse.getUsedCapacity()
-                        );
+                row.createCell(4).setCellValue(used);
 
                 row.createCell(5)
                         .setCellValue(

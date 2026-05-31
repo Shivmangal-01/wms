@@ -10,6 +10,11 @@ import lombok.Setter;
 @Setter
 public class WarehouseRequestDto {
     @NotBlank(message = "Warehouse code is required")
+    @NotBlank(message = "Warehouse code is required")
+    @Pattern(
+            regexp = "^WH[0-9]{3}$",
+            message = "Warehouse code must be in format WH001, WH002 etc."
+    )
     private String warehouseCode;
 
     @NotBlank(message = "Warehouse name is required")

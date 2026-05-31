@@ -3,6 +3,7 @@ package com.scm.wms.warehouse.entities;
 import com.scm.wms.warehouse.enums.WarehouseStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,9 @@ public class Warehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     @Column(name = "warehouse_code", nullable = false,unique = true)
     private String warehouseCode;
@@ -52,7 +56,7 @@ public class Warehouse {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    @Column(name = "used_capacity")
+    @Column(name = "used_capacity", columnDefinition = "boolean default false")
     private Integer usedCapacity;
 
     //run before insert

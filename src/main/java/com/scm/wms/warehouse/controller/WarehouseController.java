@@ -1,9 +1,14 @@
 package com.scm.wms.warehouse.controller;
 
+
+import com.scm.wms.warehouse.audit.WarehouseAuditService;
 import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
+import com.scm.wms.warehouse.dto.response.WarehouseAuditResponseDto;
 import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
+import com.scm.wms.warehouse.dto.response.WarehouseStatsDto;
 import com.scm.wms.warehouse.service.WarehouseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,8 +21,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/warehouses")
 @RequiredArgsConstructor
+
+@Tag(
+        name = "Warehouse Management",
+        description = "Operations related to warehouse module"
+)
 public class WarehouseController {
     private final WarehouseService warehouseService;
+    private final WarehouseAuditService auditService;
 
     //controller to create thr warehouse
     @PostMapping
@@ -42,14 +53,7 @@ public class WarehouseController {
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
 
-        return ResponseEntity.ok(
-                warehouseService.getAllWarehouses(
-                        page,
-                        size,
-                        sortBy,
-                        sortDir
-                )
-        );
+        return ResponseEntity.ok(warehouseService.getAllWarehouses(page, size, sortBy, sortDir));
     }
 
     //controller to get warehouse by its id
@@ -83,13 +87,34 @@ public class WarehouseController {
     }
 
     //controller to get warehouse by its name
-    @Operation(summary = "Search Warehouse By Its Name")
     @GetMapping("/search")
-    public ResponseEntity<List<WarehouseResponseDto>>
-    searchWarehouse(@RequestParam String name) {
+    @Operation(summary = "Search Warehouse By Its Name")
+    public ResponseEntity<Page<WarehouseResponseDto>> searchWarehouse(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         return ResponseEntity.ok(
-                warehouseService.searchWarehouse(name)
-        );
+                warehouseService.searchWarehouse(name, page, size));
+    }
+
+
+    @GetMapping("/stats")
+    @Operation(summary = "Get Warehouse Stats")
+    public ResponseEntity<WarehouseStatsDto> getWarehouseStats() {
+        return ResponseEntity.ok(warehouseService.getWarehouseStats());
+    }
+
+
+
+    @GetMapping("/{id}/audit")
+    @Operation(summary = "Get Audit History For Warehouse")
+    public ResponseEntity<List<WarehouseAuditResponseDto>> getAuditHistory(
+            @PathVariable Long id) {
+
+        WarehouseResponseDto warehouse = warehouseService.getWarehouseById(id);
+
+        return ResponseEntity.ok(
+                auditService.getAuditHistory(warehouse.getWarehouseCode()));
     }
 }

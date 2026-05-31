@@ -4,6 +4,7 @@ import com.scm.wms.product.dto.request.ProductRequestDto;
 import com.scm.wms.product.dto.response.ProductResponseDto;
 import com.scm.wms.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
+
+@Tag(
+        name = "Product  Management",
+        description = "Operations related to Product module"
+)
 public class ProductController {
     private final ProductService productService;
 

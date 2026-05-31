@@ -1,6 +1,7 @@
 package com.scm.wms.warehouse.service;
 
 
+import com.scm.wms.warehouse.audit.WarehouseAuditService;
 import com.scm.wms.warehouse.dto.request.WarehouseRequestDto;
 import com.scm.wms.warehouse.dto.response.WarehouseResponseDto;
 import com.scm.wms.warehouse.entities.Warehouse;
@@ -24,14 +25,17 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WarehouseServiceTest {
+
     @Mock
     private WarehouseRepository warehouseRepository;
+
+    @Mock
+    private WarehouseAuditService auditService;
 
     @InjectMocks
     private WarehouseServiceImpl warehouseService;
 
     private Warehouse warehouse;
-
     private WarehouseRequestDto requestDto;
 
     @BeforeEach
@@ -43,21 +47,25 @@ public class WarehouseServiceTest {
                 .name("Pune Warehouse")
                 .location("Pune")
                 .capacity(5000)
+                .usedCapacity(1000)
+                .isDeleted(false)
                 .managerName("Rahul")
                 .contactNumber("9876543210")
                 .status(WarehouseStatus.ACTIVE)
                 .build();
 
         requestDto = new WarehouseRequestDto();
-
         requestDto.setWarehouseCode("WH001");
         requestDto.setName("Pune Warehouse");
         requestDto.setLocation("Pune");
         requestDto.setCapacity(5000);
+        requestDto.setUsedCapacity(1000);
         requestDto.setManagerName("Rahul");
         requestDto.setContactNumber("9876543210");
         requestDto.setStatus(WarehouseStatus.ACTIVE);
     }
+
+    //create test
 
     @Test
     void createWarehouse_ShouldReturnWarehouseResponse() {
@@ -66,27 +74,18 @@ public class WarehouseServiceTest {
                 .findByWarehouseCode("WH001"))
                 .thenReturn(Optional.empty());
 
-        when(warehouseRepository.save(any(Warehouse.class)))
+        when(warehouseRepository
+                .save(any(Warehouse.class)))
                 .thenReturn(warehouse);
 
         WarehouseResponseDto response =
                 warehouseService.createWarehouse(requestDto);
 
         assertNotNull(response);
-
-        assertEquals(
-                "WH001",
-                response.getWarehouseCode()
-        );
-
-        assertEquals(
-                "Pune Warehouse",
-                response.getName()
-        );
-        verify(warehouseRepository)
-                .save(any(Warehouse.class));
+        assertEquals("WH001", response.getWarehouseCode());
+        assertEquals("Pune Warehouse", response.getName());
+        verify(warehouseRepository).save(any(Warehouse.class));
     }
-
 
     @Test
     void createWarehouse_ShouldThrowException_WhenCodeExists() {
@@ -102,10 +101,27 @@ public class WarehouseServiceTest {
 
         verify(warehouseRepository, never())
                 .save(any(Warehouse.class));
-
-
     }
 
+    @Test
+    void createWarehouse_ShouldThrowException_WhenUsedCapacityExceedsCapacity() {
+
+        requestDto.setUsedCapacity(9999);
+
+        when(warehouseRepository
+                .findByWarehouseCode("WH001"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> warehouseService.createWarehouse(requestDto)
+        );
+
+        verify(warehouseRepository, never())
+                .save(any(Warehouse.class));
+    }
+
+    // Get by id test
 
     @Test
     void getWarehouseById_ShouldReturnWarehouse() {
@@ -117,13 +133,9 @@ public class WarehouseServiceTest {
                 warehouseService.getWarehouseById(1L);
 
         assertNotNull(response);
-
-        assertEquals(
-                "WH001",
-                response.getWarehouseCode()
-        );
+        assertEquals("WH001", response.getWarehouseCode());
+        assertEquals("Pune Warehouse", response.getName());
     }
-
 
     @Test
     void getWarehouseById_ShouldThrowException_WhenNotFound() {
@@ -138,6 +150,73 @@ public class WarehouseServiceTest {
     }
 
     @Test
+    void getWarehouseById_ShouldThrowException_WhenSoftDeleted() {
+
+        warehouse.setIsDeleted(true);
+
+        when(warehouseRepository.findById(1L))
+                .thenReturn(Optional.of(warehouse));
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> warehouseService.getWarehouseById(1L)
+        );
+    }
+
+    // Update test
+
+    @Test
+    void updateWarehouse_ShouldReturnUpdatedWarehouse() {
+
+        requestDto.setName("Mumbai Warehouse");
+        requestDto.setLocation("Mumbai");
+
+        when(warehouseRepository.findById(1L))
+                .thenReturn(Optional.of(warehouse));
+
+        when(warehouseRepository
+                .save(any(Warehouse.class)))
+                .thenReturn(warehouse);
+
+        WarehouseResponseDto response =
+                warehouseService.updateWarehouse(1L, requestDto);
+
+        assertNotNull(response);
+        verify(warehouseRepository).save(any(Warehouse.class));
+    }
+
+    @Test
+    void updateWarehouse_ShouldThrowException_WhenNotFound() {
+
+        when(warehouseRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> warehouseService.updateWarehouse(99L, requestDto)
+        );
+
+        verify(warehouseRepository, never())
+                .save(any(Warehouse.class));
+    }
+
+    @Test
+    void updateWarehouse_ShouldThrowException_WhenUsedCapacityExceedsCapacity() {
+
+        requestDto.setUsedCapacity(9999);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> warehouseService.updateWarehouse(1L, requestDto)
+        );
+
+        verify(warehouseRepository, never())
+                .save(any(Warehouse.class));
+    }
+
+    // delete test
+
+    @Test
     void deleteWarehouse_ShouldSoftDeleteWarehouse() {
 
         when(warehouseRepository.findById(1L))
@@ -146,5 +225,21 @@ public class WarehouseServiceTest {
         warehouseService.deleteWarehouse(1L);
 
         assertTrue(warehouse.getIsDeleted());
+        verify(warehouseRepository).save(warehouse);
+    }
+
+    @Test
+    void deleteWarehouse_ShouldThrowException_WhenNotFound() {
+
+        when(warehouseRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> warehouseService.deleteWarehouse(99L)
+        );
+
+        verify(warehouseRepository, never())
+                .save(any(Warehouse.class));
     }
 }

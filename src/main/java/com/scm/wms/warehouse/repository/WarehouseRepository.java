@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface WarehouseRepository  extends JpaRepository<Warehouse, Long> {
     Optional<Warehouse> findByWarehouseCode(String warehouseCode);
-    List<Warehouse> findByName(String name);
+    Page<Warehouse> findByNameContainingIgnoreCaseAndIsDeletedFalse(String name, Pageable pageable);
     Page<Warehouse> findByIsDeletedFalse(Pageable pageable);
+    List<Warehouse> findByIsDeletedFalse();
 }
